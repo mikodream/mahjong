@@ -37,6 +37,11 @@ func (d *Deck) BottomDrawOne() card.ID {
 	return tile
 }
 
+func (d *Deck) SetNextDraw(tile card.ID) {
+	// Prepend tile to d.tiles
+	d.tiles = append([]card.ID{tile}, d.tiles...)
+}
+
 func fillDeck(deck *Deck) {
 	tiles := make([]int, 0, 144)
 	generate := func(tile, num, count int) []int {

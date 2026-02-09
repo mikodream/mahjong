@@ -6,33 +6,33 @@ import (
 	"github.com/feel-easy/mahjong/event"
 )
 
-type playerController struct {
+type PlayerController struct {
 	player    Player
 	hand      *Hand
 	showCards []*ShowCard
 }
 
-func newPlayerController(player Player) *playerController {
-	return &playerController{
+func NewPlayerController(player Player) *PlayerController {
+	return &PlayerController{
 		player:    player,
 		hand:      NewHand(),
 		showCards: make([]*ShowCard, 0, 5),
 	}
 }
 
-func (c *playerController) DarkGang(tile card.ID) {
+func (c *PlayerController) DarkGang(tile card.ID) {
 	c.showCards = append(c.showCards, NewShowCard(consts.GANG, 0, []card.ID{tile, tile, tile, tile}, false, false))
 }
 
-func (c *playerController) operation(op, target int, tiles []card.ID) {
+func (c *PlayerController) operation(op, target int, tiles []card.ID) {
 	c.showCards = append(c.showCards, NewShowCard(op, target, tiles, true, false))
 }
 
-func (c *playerController) GetShowCard() []*ShowCard {
+func (c *PlayerController) GetShowCard() []*ShowCard {
 	return c.showCards
 }
 
-func (c *playerController) FindShowCard(id card.ID) *ShowCard {
+func (c *PlayerController) FindShowCard(id card.ID) *ShowCard {
 	for _, sc := range c.showCards {
 		for _, tile := range sc.tiles {
 			if tile == id {
@@ -43,7 +43,7 @@ func (c *playerController) FindShowCard(id card.ID) *ShowCard {
 	return nil
 }
 
-func (c *playerController) GetShowCardTiles() []card.ID {
+func (c *PlayerController) GetShowCardTiles() []card.ID {
 	ret := make([]card.ID, 0, len(c.showCards)*4)
 	for _, t := range c.showCards {
 		ret = append(ret, t.tiles...)
@@ -51,11 +51,11 @@ func (c *playerController) GetShowCardTiles() []card.ID {
 	return ret
 }
 
-func (c *playerController) AddTiles(tiles []card.ID) {
+func (c *PlayerController) AddTiles(tiles []card.ID) {
 	c.hand.AddTiles(tiles)
 }
 
-func (c *playerController) TryTopDecking(deck *Deck) {
+func (c *PlayerController) TryTopDecking(deck *Deck) {
 	extraCard := deck.DrawOne()
 	c.AddTiles([]card.ID{extraCard})
 	event.PlayTile.Emit(event.PlayTilePayload{
@@ -64,7 +64,7 @@ func (c *playerController) TryTopDecking(deck *Deck) {
 	})
 }
 
-func (c *playerController) TryBottomDecking(deck *Deck) {
+func (c *PlayerController) TryBottomDecking(deck *Deck) {
 	extraCard := deck.BottomDrawOne()
 	c.AddTiles([]card.ID{extraCard})
 	event.PlayTile.Emit(event.PlayTilePayload{
@@ -73,30 +73,30 @@ func (c *playerController) TryBottomDecking(deck *Deck) {
 	})
 }
 
-func (c *playerController) Hand() []card.ID {
+func (c *PlayerController) Hand() []card.ID {
 	tiles := c.Tiles()
 	return sliceDel(tiles, c.GetShowCardTiles()...)
 }
 
-func (c *playerController) Tiles() []card.ID {
+func (c *PlayerController) Tiles() []card.ID {
 	return c.hand.Tiles()
 }
-func (c *playerController) LastTile() card.ID {
+func (c *PlayerController) LastTile() card.ID {
 	return c.hand.Tiles()[len(c.hand.Tiles())-1]
 }
 
-func (c *playerController) Name() string {
+func (c *PlayerController) Name() string {
 	return c.player.NickName()
 }
 
-func (c *playerController) ID() int {
+func (c *PlayerController) ID() int {
 	return c.player.PlayerID()
 }
-func (c *playerController) Player() *Player {
-	return &c.player
+func (c *PlayerController) Player() Player {
+	return c.player
 }
 
-func (c *playerController) Take(gameState State, deck *Deck, pile *Pile) (int, bool, error) {
+func (c *PlayerController) Take(gameState State, deck *Deck, pile *Pile) (int, bool, error) {
 	tiles := make([]card.ID, 0, len(c.Hand())+1)
 	tiles = append(tiles, c.Hand()...)
 	tiles = append(tiles, pile.Top())
@@ -120,12 +120,18 @@ func (c *playerController) Take(gameState State, deck *Deck, pile *Pile) (int, b
 		pile.AddSayNoPlayer(c)
 		return op, false, nil
 	}
-	c.AddTiles([]card.ID{pile.BottomDrawOne()})
+	isSelfAction := gameState.OriginallyPlayer.ID() == c.ID()
+	if !isSelfAction {
+		c.AddTiles([]card.ID{pile.BottomDrawOne()})
+	}
 	c.operation(op, int(pile.LastPlayer().ID()), tiles)
+	if op == consts.GANG {
+		c.TryBottomDecking(deck)
+	}
 	return op, true, nil
 }
 
-func (c *playerController) Play(gameState State) (card.ID, error) {
+func (c *PlayerController) Play(gameState State) (card.ID, error) {
 	selectedTile, err := c.player.Play(c.Hand(), gameState)
 	if err != nil {
 		return 0, err
@@ -134,11 +140,11 @@ func (c *playerController) Play(gameState State) (card.ID, error) {
 	return selectedTile, nil
 }
 
-func (c *playerController) RemoveTile(tile card.ID) {
+func (c *PlayerController) RemoveTile(tile card.ID) {
 	c.hand.RemoveTile(tile)
 }
 
-func (c *playerController) RemoveTiles(tiles []card.ID) {
+func (c *PlayerController) RemoveTiles(tiles []card.ID) {
 	c.hand.RemoveTiles(tiles)
 }
 

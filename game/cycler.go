@@ -19,6 +19,10 @@ func NewCycler(elements []int) *Cycler {
 	}
 }
 
+func (c *Cycler) Elements() []int {
+	return c.elements
+}
+
 func (c *Cycler) Current() int {
 	return c.elements[c.current]
 }

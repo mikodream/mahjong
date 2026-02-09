@@ -160,3 +160,76 @@ func TestGetTingTiles(t *testing.T) {
 		t.Errorf("九莲宝灯应该听9张牌，实际听了 %d 张", len(tingList))
 	}
 }
+
+// TestSevenPairsWithFourTiles 测试带4张相同牌的七对子
+func TestSevenPairsWithFourTiles(t *testing.T) {
+	// 4x1万, 4x1筒, 4x1条, 2万, 2万 (14张)
+	// 1万x4 (2对), 1筒x4 (2对), 1条x4 (2对), 2万x2 (1对) -> 共7对
+	hand := []card.ID{
+		card.MAHJONG_CRAK1, card.MAHJONG_CRAK1, card.MAHJONG_CRAK1, card.MAHJONG_CRAK1,
+		card.MAHJONG_DOT1, card.MAHJONG_DOT1, card.MAHJONG_DOT1, card.MAHJONG_DOT1,
+		card.MAHJONG_BAM1, card.MAHJONG_BAM1, card.MAHJONG_BAM1, card.MAHJONG_BAM1,
+		card.MAHJONG_CRAK2, card.MAHJONG_CRAK2,
+	}
+
+	if !CanWin(hand, nil) {
+		t.Error("4张相同牌的七对子验证失败")
+	}
+}
+
+// TestSevenPairsTing 测试七对子听牌
+func TestSevenPairsTing(t *testing.T) {
+	// 11 11 11 11 11 11 + 2m (13张)
+	hand := []card.ID{
+		card.MAHJONG_CRAK1, card.MAHJONG_CRAK1,
+		card.MAHJONG_DOT1, card.MAHJONG_DOT1,
+		card.MAHJONG_BAM1, card.MAHJONG_BAM1,
+		card.MAHJONG_CRAK3, card.MAHJONG_CRAK3,
+		card.MAHJONG_DOT3, card.MAHJONG_DOT3,
+		card.MAHJONG_BAM3, card.MAHJONG_BAM3,
+		card.MAHJONG_CRAK2,
+	}
+
+	tingList := GetTingTiles(hand, nil)
+	// 应该只听 2万
+	if len(tingList) != 1 || tingList[0] != card.MAHJONG_CRAK2 {
+		t.Errorf("七对子听牌验证失败，期望 [2万], 实际 %v", tingList)
+	}
+}
+
+// TestComplexStandardWin 测试复杂标准胡牌
+func TestComplexStandardWin(t *testing.T) {
+	// 111m (刻) + 234m (顺) + 55m (将) + 678p (顺) + 999s (刻)
+	hand := []card.ID{
+		card.MAHJONG_CRAK1, card.MAHJONG_CRAK1, card.MAHJONG_CRAK1,
+		card.MAHJONG_CRAK2, card.MAHJONG_CRAK3, card.MAHJONG_CRAK4,
+		card.MAHJONG_CRAK5, card.MAHJONG_CRAK5,
+		card.MAHJONG_DOT6, card.MAHJONG_DOT7, card.MAHJONG_DOT8,
+		card.MAHJONG_BAM9, card.MAHJONG_BAM9, card.MAHJONG_BAM9,
+	}
+
+	if !CanWin(hand, nil) {
+		t.Error("复杂标准胡牌验证失败")
+	}
+}
+
+// TestFailCases 测试不该胡的牌
+func TestFailCases(t *testing.T) {
+	// 1. 缺一张 (13张)
+	hand := []card.ID{1, 1, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 9}
+	if CanWin(hand, nil) {
+		t.Error("13张牌不应直接胡")
+	}
+
+	// 2. 杂乱牌 (14张但是不胡)
+	hand2 := []card.ID{
+		card.MAHJONG_CRAK1, card.MAHJONG_CRAK2, card.MAHJONG_CRAK5,
+		card.MAHJONG_DOT1, card.MAHJONG_DOT2, card.MAHJONG_DOT5,
+		card.MAHJONG_BAM1, card.MAHJONG_BAM2, card.MAHJONG_BAM5,
+		card.MAHJONG_EAST, card.MAHJONG_SOUTH, card.MAHJONG_WEST,
+		card.MAHJONG_RED, card.MAHJONG_WHITE,
+	}
+	if CanWin(hand2, nil) {
+		t.Error("杂乱牌不应胡")
+	}
+}

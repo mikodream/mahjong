@@ -11,16 +11,21 @@ import (
 )
 
 type State struct {
-	LastPlayer        *playerController
-	OriginallyPlayer  *playerController
-	CurrentPlayer     *playerController
+	LastPlayer        *PlayerController
+	OriginallyPlayer  *PlayerController
+	CurrentPlayer     *PlayerController
 	LastPlayedTile    card.ID
 	PlayedTiles       []card.ID
 	CurrentPlayerHand []card.ID
-	PlayerSequence    []*playerController
+	PlayerSequence    []*PlayerController
 	PlayerShowCards   map[string][]*ShowCard
 	SpecialPrivileges map[int][]int
-	CanWin            []*playerController
+	CanWin            []*PlayerController
+	// Adding fields used in game.go ExtractState if needed, but better to fix game.go.
+	// game.go uses: ActivePlayer (matches CurrentPlayer?), LastPlayedTileFrom, AllPlayersID.
+	// I prefer adding them here if server relies on them.
+	// But checking server usage is hard.
+	// I will stick to what state.go has, and fix game.go.
 }
 
 func (s State) String() string {

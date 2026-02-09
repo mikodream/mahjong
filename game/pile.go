@@ -4,28 +4,28 @@ import "github.com/feel-easy/mahjong/card"
 
 type Pile struct {
 	tiles            []card.ID
-	lastPlayer       *playerController
-	originallyPlayer *playerController
-	currentPlayer    *playerController
-	sayNoPlayer      map[int]*playerController
+	lastPlayer       *PlayerController
+	originallyPlayer *PlayerController
+	currentPlayer    *PlayerController
+	sayNoPlayer      map[int]*PlayerController
 }
 
-func (p *Pile) SetCurrentPlayer(player *playerController) {
+func (p *Pile) SetCurrentPlayer(player *PlayerController) {
 	p.currentPlayer = player
 }
 
-func (p *Pile) CurrentPlayer() *playerController {
+func (p *Pile) CurrentPlayer() *PlayerController {
 	return p.currentPlayer
 }
 
-func (p *Pile) AddSayNoPlayer(player *playerController) {
+func (p *Pile) AddSayNoPlayer(player *PlayerController) {
 	if p.sayNoPlayer == nil {
-		p.sayNoPlayer = make(map[int]*playerController)
+		p.sayNoPlayer = make(map[int]*PlayerController)
 	}
 	p.sayNoPlayer[player.ID()] = player
 }
 
-func (p *Pile) SayNoPlayer() map[int]*playerController {
+func (p *Pile) SayNoPlayer() map[int]*PlayerController {
 	return p.sayNoPlayer
 }
 
@@ -33,20 +33,20 @@ func NewPile() *Pile {
 	return &Pile{tiles: make([]card.ID, 0, 144)}
 }
 
-func (p *Pile) SetOriginallyPlayer(player *playerController) {
+func (p *Pile) SetOriginallyPlayer(player *PlayerController) {
 	p.originallyPlayer = player
-	p.sayNoPlayer = make(map[int]*playerController)
+	p.sayNoPlayer = make(map[int]*PlayerController)
 }
 
-func (p *Pile) OriginallyPlayer() *playerController {
+func (p *Pile) OriginallyPlayer() *PlayerController {
 	return p.originallyPlayer
 }
 
-func (p *Pile) SetLastPlayer(player *playerController) {
+func (p *Pile) SetLastPlayer(player *PlayerController) {
 	p.lastPlayer = player
 }
 
-func (p *Pile) LastPlayer() *playerController {
+func (p *Pile) LastPlayer() *PlayerController {
 	return p.lastPlayer
 }
 

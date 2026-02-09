@@ -13,6 +13,18 @@ func HaveGang(tiles []ID) (ID, bool) {
 	return 0, false
 }
 
+func HaveGangs(tiles []ID) []ID {
+	cmap := NewCMap()
+	cmap.SetTiles(tiles)
+	gangs := make([]ID, 0)
+	for t, i := range cmap.GetTileMap() {
+		if i == 4 {
+			gangs = append(gangs, t)
+		}
+	}
+	return gangs
+}
+
 // 判断是不是可以吃
 func CanChi(cards []ID, card ID) bool {
 	if card == 0 {
@@ -51,6 +63,13 @@ func CanGang(cards []ID, card ID) bool {
 	cmap := NewCMap()
 	cmap.SetTiles(cards)
 	return cmap.GetTileCnt(card) == 4
+}
+
+// 判断是不是可以明杠
+func CanMingGang(cards []ID, card ID) bool {
+	cmap := NewCMap()
+	cmap.SetTiles(cards)
+	return cmap.GetTileCnt(card) == 3
 }
 
 // IsSuit 是否普通牌
