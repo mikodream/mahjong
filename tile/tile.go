@@ -1,6 +1,10 @@
 package tile
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/feel-easy/mahjong/card"
+)
 
 type Tile int
 
@@ -16,7 +20,7 @@ func (c Tile) String() string {
 	return TILE_DATA[c.Type()][c.Number()]
 }
 
-func ToTileString(tiles []int) string {
+func ToTileString(tiles []card.ID) string {
 	ret := make([]string, 0, len(tiles))
 	for _, t := range tiles {
 		ret = append(ret, Tile(t).String())

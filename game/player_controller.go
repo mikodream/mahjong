@@ -1,9 +1,9 @@
 package game
 
 import (
+	"github.com/feel-easy/mahjong/card"
 	"github.com/feel-easy/mahjong/consts"
 	"github.com/feel-easy/mahjong/event"
-	"github.com/feel-easy/mahjong/util"
 )
 
 type playerController struct {
@@ -20,11 +20,11 @@ func newPlayerController(player Player) *playerController {
 	}
 }
 
-func (c *playerController) DarkGang(tile int) {
-	c.showCards = append(c.showCards, NewShowCard(consts.GANG, 0, []int{tile, tile, tile, tile}, false, false))
+func (c *playerController) DarkGang(tile card.ID) {
+	c.showCards = append(c.showCards, NewShowCard(consts.GANG, 0, []card.ID{tile, tile, tile, tile}, false, false))
 }
 
-func (c *playerController) operation(op, target int, tiles []int) {
+func (c *playerController) operation(op, target int, tiles []card.ID) {
 	c.showCards = append(c.showCards, NewShowCard(op, target, tiles, true, false))
 }
 
@@ -32,30 +32,32 @@ func (c *playerController) GetShowCard() []*ShowCard {
 	return c.showCards
 }
 
-func (c *playerController) FindShowCard(id int) *ShowCard {
+func (c *playerController) FindShowCard(id card.ID) *ShowCard {
 	for _, sc := range c.showCards {
-		if util.IntInSlice(id, sc.tiles) {
-			return sc
+		for _, tile := range sc.tiles {
+			if tile == id {
+				return sc
+			}
 		}
 	}
 	return nil
 }
 
-func (c *playerController) GetShowCardTiles() []int {
-	ret := make([]int, 0, len(c.showCards)*4)
+func (c *playerController) GetShowCardTiles() []card.ID {
+	ret := make([]card.ID, 0, len(c.showCards)*4)
 	for _, t := range c.showCards {
 		ret = append(ret, t.tiles...)
 	}
 	return ret
 }
 
-func (c *playerController) AddTiles(tiles []int) {
+func (c *playerController) AddTiles(tiles []card.ID) {
 	c.hand.AddTiles(tiles)
 }
 
 func (c *playerController) TryTopDecking(deck *Deck) {
 	extraCard := deck.DrawOne()
-	c.AddTiles([]int{extraCard})
+	c.AddTiles([]card.ID{extraCard})
 	event.PlayTile.Emit(event.PlayTilePayload{
 		PlayerName: c.player.NickName(),
 		Tile:       extraCard,
@@ -64,22 +66,22 @@ func (c *playerController) TryTopDecking(deck *Deck) {
 
 func (c *playerController) TryBottomDecking(deck *Deck) {
 	extraCard := deck.BottomDrawOne()
-	c.AddTiles([]int{extraCard})
+	c.AddTiles([]card.ID{extraCard})
 	event.PlayTile.Emit(event.PlayTilePayload{
 		PlayerName: c.player.NickName(),
 		Tile:       extraCard,
 	})
 }
 
-func (c *playerController) Hand() []int {
+func (c *playerController) Hand() []card.ID {
 	tiles := c.Tiles()
-	return util.SliceDel(tiles, c.GetShowCardTiles()...)
+	return sliceDel(tiles, c.GetShowCardTiles()...)
 }
 
-func (c *playerController) Tiles() []int {
+func (c *playerController) Tiles() []card.ID {
 	return c.hand.Tiles()
 }
-func (c *playerController) LastTile() int {
+func (c *playerController) LastTile() card.ID {
 	return c.hand.Tiles()[len(c.hand.Tiles())-1]
 }
 
@@ -95,7 +97,7 @@ func (c *playerController) Player() *Player {
 }
 
 func (c *playerController) Take(gameState State, deck *Deck, pile *Pile) (int, bool, error) {
-	tiles := make([]int, 0, len(c.Hand())+1)
+	tiles := make([]card.ID, 0, len(c.Hand())+1)
 	tiles = append(tiles, c.Hand()...)
 	tiles = append(tiles, pile.Top())
 	op, tiles, err := c.player.Take(tiles, gameState)
@@ -118,16 +120,36 @@ func (c *playerController) Take(gameState State, deck *Deck, pile *Pile) (int, b
 		pile.AddSayNoPlayer(c)
 		return op, false, nil
 	}
-	c.AddTiles([]int{pile.BottomDrawOne()})
+	c.AddTiles([]card.ID{pile.BottomDrawOne()})
 	c.operation(op, int(pile.LastPlayer().ID()), tiles)
 	return op, true, nil
 }
 
-func (c *playerController) Play(gameState State) (int, error) {
+func (c *playerController) Play(gameState State) (card.ID, error) {
 	selectedTile, err := c.player.Play(c.Hand(), gameState)
 	if err != nil {
 		return 0, err
 	}
 	c.hand.RemoveTile(selectedTile)
 	return selectedTile, nil
+}
+
+func (c *playerController) RemoveTile(tile card.ID) {
+	c.hand.RemoveTile(tile)
+}
+
+func (c *playerController) RemoveTiles(tiles []card.ID) {
+	c.hand.RemoveTiles(tiles)
+}
+
+func sliceDel(slice []card.ID, elems ...card.ID) []card.ID {
+	for _, e := range elems {
+		for i, v := range slice {
+			if v == e {
+				slice = append(slice[:i], slice[i+1:]...)
+				break
+			}
+		}
+	}
+	return slice
 }

@@ -1,7 +1,9 @@
 package game
 
+import "github.com/feel-easy/mahjong/card"
+
 type Pile struct {
-	tiles            []int
+	tiles            []card.ID
 	lastPlayer       *playerController
 	originallyPlayer *playerController
 	currentPlayer    *playerController
@@ -28,7 +30,7 @@ func (p *Pile) SayNoPlayer() map[int]*playerController {
 }
 
 func NewPile() *Pile {
-	return &Pile{tiles: make([]int, 0, 144)}
+	return &Pile{tiles: make([]card.ID, 0, 144)}
 }
 
 func (p *Pile) SetOriginallyPlayer(player *playerController) {
@@ -48,21 +50,21 @@ func (p *Pile) LastPlayer() *playerController {
 	return p.lastPlayer
 }
 
-func (p *Pile) Add(tile int) {
+func (p *Pile) Add(tile card.ID) {
 	p.tiles = append(p.tiles, tile)
 }
 
-func (p *Pile) Tiles() []int {
-	tiles := make([]int, len(p.tiles))
+func (p *Pile) Tiles() []card.ID {
+	tiles := make([]card.ID, len(p.tiles))
 	copy(tiles, p.tiles)
 	return tiles
 }
 
-func (p *Pile) ReplaceTop(tile int) {
+func (p *Pile) ReplaceTop(tile card.ID) {
 	p.tiles[len(p.tiles)-1] = tile
 }
 
-func (p *Pile) Top() int {
+func (p *Pile) Top() card.ID {
 	pileSize := len(p.tiles)
 	if pileSize == 0 {
 		return 0
@@ -70,7 +72,7 @@ func (p *Pile) Top() int {
 	return p.tiles[pileSize-1]
 }
 
-func (d *Pile) BottomDrawOne() int {
+func (d *Pile) BottomDrawOne() card.ID {
 	tile := d.tiles[len(d.tiles)-1]
 	d.tiles = d.tiles[0 : len(d.tiles)-1]
 	return tile

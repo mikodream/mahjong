@@ -5,7 +5,7 @@ import (
 )
 
 func TestCardMap(t *testing.T) {
-	initTiles := []int{3, 2, 1, 7, 9, 8, 7, 3, 1}
+	initTiles := []ID{3, 2, 1, 7, 9, 8, 7, 3, 1}
 	cm := NewCMap()
 	cm.SetTiles(initTiles)
 

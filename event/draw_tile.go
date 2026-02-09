@@ -1,10 +1,12 @@
 package event
 
+import "github.com/feel-easy/mahjong/card"
+
 var PlayTile = &playTileEmitter{}
 
 type PlayTilePayload struct {
 	PlayerName string
-	Tile       int
+	Tile       card.ID
 }
 
 type PlayTileListener interface {

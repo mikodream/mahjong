@@ -67,9 +67,15 @@ func (g Game) ExtractState(player *playerController) State {
 		playerShowCards[player.Name()] = player.GetShowCard()
 		if _, ok := g.pile.SayNoPlayer()[player.ID()]; !ok &&
 			topTile > 0 && g.pile.lastPlayer.ID() != player.ID() {
-			if win.CanWin(append(player.Hand(), g.pile.Top()), player.GetShowCardTiles()) {
+			handWithTop := make([]card.ID, len(player.Hand()))
+			copy(handWithTop, player.Hand())
+			handWithTop = append(handWithTop, topTile)
+			if win.CanWin(handWithTop, player.GetShowCardTiles()) {
 				canWin = append(canWin, player)
 			}
+			// Note: card package functions currently take int, will update to card.ID
+			// Casting for now or updating card package later?
+			// I will update card package to take card.ID.
 			if card.CanGang(player.Hand(), topTile) {
 				specialPrivileges[player.ID()] = append(specialPrivileges[player.ID()], consts.GANG)
 			}

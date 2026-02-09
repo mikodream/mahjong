@@ -2,7 +2,7 @@ package card
 
 import "github.com/feel-easy/mahjong/util"
 
-func HaveGang(tiles []int) (int, bool) {
+func HaveGang(tiles []ID) (ID, bool) {
 	cmap := NewCMap()
 	cmap.SetTiles(tiles)
 	for t, i := range cmap.GetTileMap() {
@@ -14,7 +14,7 @@ func HaveGang(tiles []int) (int, bool) {
 }
 
 // 判断是不是可以吃
-func CanChi(cards []int, card int) bool {
+func CanChi(cards []ID, card ID) bool {
 	if card == 0 {
 		return false
 	}
@@ -22,32 +22,32 @@ func CanChi(cards []int, card int) bool {
 }
 
 // 可以吃的牌
-func CanChiTiles(cards []int, card int) [][]int {
-	if !IsSuit(card) {
-		return [][]int{}
+func CanChiTiles(cards []ID, card ID) [][]ID {
+	if !card.IsSuit() {
+		return [][]ID{}
 	}
-	ret := make([][]int, 0)
-	if util.IntInSlice(card+1, cards) && util.IntInSlice(card+2, cards) {
-		ret = append(ret, []int{card + 1, card + 2})
+	ret := make([][]ID, 0)
+	if IDInSlice(card+1, cards) && IDInSlice(card+2, cards) {
+		ret = append(ret, []ID{card + 1, card + 2})
 	}
-	if util.IntInSlice(card-1, cards) && util.IntInSlice(card-2, cards) {
-		ret = append(ret, []int{card - 1, card - 2})
+	if IDInSlice(card-1, cards) && IDInSlice(card-2, cards) {
+		ret = append(ret, []ID{card - 1, card - 2})
 	}
-	if util.IntInSlice(card-1, cards) && util.IntInSlice(card+1, cards) {
-		ret = append(ret, []int{card - 1, card + 1})
+	if IDInSlice(card-1, cards) && IDInSlice(card+1, cards) {
+		ret = append(ret, []ID{card - 1, card + 1})
 	}
 	return ret
 }
 
 // 判断是不是可以碰
-func CanPeng(cards []int, card int) bool {
+func CanPeng(cards []ID, card ID) bool {
 	cmap := NewCMap()
 	cmap.SetTiles(cards)
 	return cmap.GetTileCnt(card) == 2
 }
 
 // 判断是不是可以杠
-func CanGang(cards []int, card int) bool {
+func CanGang(cards []ID, card ID) bool {
 	cmap := NewCMap()
 	cmap.SetTiles(cards)
 	return cmap.GetTileCnt(card) == 4
@@ -55,7 +55,7 @@ func CanGang(cards []int, card int) bool {
 
 // IsSuit 是否普通牌
 // 普通牌是指万、筒、条
-func IsSuit(card int) bool {
+func IsSuit(card ID) bool {
 	return card < MAHJONG_DOT_PLACEHOLDER
 }
 
@@ -66,18 +66,19 @@ func IsSuit(card int) bool {
 // 非万、筒、条 只有自己
 func GetSelfAndNeighborCards(cards ...int) []int {
 	result := []int{}
-	for _, card := range cards {
-		result = append(result, card)
+	for _, c := range cards {
+		cardID := ID(c)
+		result = append(result, c)
 		// 非普通牌、只有自身
-		if !IsSuit(card) {
+		if !cardID.IsSuit() {
 			continue
 		}
-		if util.IntInSlice(card, LeftSideCards) {
-			result = append(result, card+1)
-		} else if util.IntInSlice(card, RightSideCards) {
-			result = append(result, card-1)
+		if IDInSlice(cardID, LeftSideCards) {
+			result = append(result, c+1)
+		} else if IDInSlice(cardID, RightSideCards) {
+			result = append(result, c-1)
 		} else {
-			result = append(result, card-1, card+1)
+			result = append(result, c-1, c+1)
 		}
 	}
 	return util.SliceUniqueInt(result)
@@ -87,70 +88,90 @@ func GetSelfAndNeighborCards(cards ...int) []int {
 // 包括自己、相邻的、跳张
 func GetRelationTiles(cards ...int) []int {
 	result := []int{}
-	for _, card := range cards {
-		result = append(result, card)
+	for _, c := range cards {
+		cardID := ID(c)
+		result = append(result, c)
 		// 非普通牌、只有自身
-		if !IsSuit(card) {
+		if !cardID.IsSuit() {
 			continue
 		}
 
-		if util.IntInSlice(card, LeftSideCards) {
-			result = append(result, card+1, card+2)
-		} else if util.IntInSlice(card, LeftSideNeighborCards) {
-			result = append(result, card+1, card+2, card-1)
-		} else if util.IntInSlice(card, RightSideNeighborCards) {
-			result = append(result, card-1, card-2, card+1)
-		} else if util.IntInSlice(card, RightSideCards) {
-			result = append(result, card-1, card-2)
+		if IDInSlice(cardID, LeftSideCards) {
+			result = append(result, c+1, c+2)
+		} else if IDInSlice(cardID, LeftSideNeighborCards) {
+			result = append(result, c+1, c+2, c-1)
 		} else {
-			result = append(result, card-1, card-2, card+1, card+2)
+			// 中间牌
+			if IDInSlice(cardID, RightSideCards) {
+				result = append(result, c-1, c-2)
+			} else if IDInSlice(cardID, RightSideNeighborCards) {
+				result = append(result, c-1, c-2, c+1)
+			} else {
+				result = append(result, c-1, c-2, c+1, c+2)
+			}
 		}
 	}
 	return util.SliceUniqueInt(result)
 }
 
-// IsSameType 检查两张牌是否同类
-func IsSameType(checkCard, lackCard int) bool {
-	return checkCard/10 == lackCard/10
+// IsHonor 是否风牌/字牌
+func IsHonor(card ID) bool {
+	return card >= MAHJONG_EAST
 }
 
-// IsCrak 是否万
-func IsCrak(card int) bool {
-	return card >= MAHJONG_CRAK1 && card <= MAHJONG_CRAK9
+// IsTerminal 是否幺九牌
+func IsTerminal(card ID) bool {
+	if IsHonor(card) {
+		return true
+	}
+	return IDInSlice(card, []ID{1, 9, 11, 19, 21, 29})
 }
 
-// IsBAM 是否条
-func IsBAM(card int) bool {
-	return card >= MAHJONG_BAM1 && card <= MAHJONG_BAM9
+// IsYaoJiu IsTerminal 的别名
+func IsYaoJiu(card ID) bool {
+	return IsTerminal(card)
 }
 
-// IsDot 是否筒
-func IsDot(card int) bool {
-	return card >= MAHJONG_DOT1 && card <= MAHJONG_DOT9
+// IsGreen 是否绿一色牌
+func IsGreen(card ID) bool {
+	return card.IsBam() || card == MAHJONG_GREE
 }
 
-// GetBehindCardCycle 获取某张牌的下一张牌（循环获取）
-func GetBehindCardCycle(card int) int {
-	var behind int
-	if IsSuit(card) {
-		if util.IntInSlice(card, RightSideCards) {
-			behind = card - 8
-		} else {
-			behind = card + 1
+func IDInSlice(id ID, slice []ID) bool {
+	for _, v := range slice {
+		if v == id {
+			return true
 		}
 	}
-	return behind
+	return false
 }
 
-// GetFrontCardCycle 获取某张牌的前一张牌（循环获取）
-func GetFrontCardCycle(card int) int {
-	var front int
-	if IsSuit(card) {
-		if util.IntInSlice(card, LeftSideCards) {
-			front = card + 8
-		} else {
-			front = card - 1
-		}
-	}
-	return front
+// Type methods
+
+func (id ID) Int() int {
+	return int(id)
+}
+
+func (id ID) IsSuit() bool {
+	return id < MAHJONG_DOT_PLACEHOLDER
+}
+
+func (id ID) IsCrak() bool {
+	return id >= MAHJONG_CRAK1 && id <= MAHJONG_CRAK9
+}
+
+func (id ID) IsBam() bool {
+	return id >= MAHJONG_BAM1 && id <= MAHJONG_BAM9
+}
+
+func (id ID) IsDot() bool {
+	return id >= MAHJONG_DOT1 && id <= MAHJONG_DOT9
+}
+
+func (id ID) IsHonor() bool {
+	return id >= MAHJONG_EAST
+}
+
+func (id ID) Rank() int {
+	return int(id) % 10
 }

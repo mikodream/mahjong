@@ -3,11 +3,12 @@ package game
 import (
 	"math/rand"
 
+	"github.com/feel-easy/mahjong/card"
 	"github.com/feel-easy/mahjong/tile"
 )
 
 type Deck struct {
-	tiles []int
+	tiles []card.ID
 }
 
 func NewDeck() *Deck {
@@ -20,17 +21,17 @@ func (d *Deck) NoTiles() bool {
 	return len(d.tiles) == 0
 }
 
-func (d *Deck) DrawOne() int {
+func (d *Deck) DrawOne() card.ID {
 	return d.Draw(1)[0]
 }
 
-func (d *Deck) Draw(amount int) []int {
+func (d *Deck) Draw(amount int) []card.ID {
 	tiles := d.tiles[0:amount]
 	d.tiles = d.tiles[amount:]
 	return tiles
 }
 
-func (d *Deck) BottomDrawOne() int {
+func (d *Deck) BottomDrawOne() card.ID {
 	tile := d.tiles[len(d.tiles)-1]
 	d.tiles = d.tiles[:len(d.tiles)-1]
 	return tile
@@ -54,8 +55,11 @@ func fillDeck(deck *Deck) {
 	tiles = append(tiles, generate(tile.DRAGON, 3, 4)...)
 	// tiles = append(tiles, generate(tile.SEASON, 4, 1)...)
 	// tiles = append(tiles, generate(tile.HUA, 4, 1)...)
+	// tiles = append(tiles, generate(tile.HUA, 4, 1)...)
 	shuffleCards(tiles)
-	deck.tiles = append(deck.tiles, tiles...)
+	for _, t := range tiles {
+		deck.tiles = append(deck.tiles, card.ID(t))
+	}
 }
 
 func shuffleCards(tiles []int) {
