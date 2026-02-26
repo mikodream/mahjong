@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/feel-easy/mahjong/card"
+	"github.com/mikodream/mahjong/card"
 )
 
 // TestFindPairPos 测试找出对的位置是否正确

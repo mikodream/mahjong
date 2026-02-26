@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/feel-easy/mahjong/card"
-	"github.com/feel-easy/mahjong/tile"
-	"github.com/feel-easy/mahjong/ting"
+	"github.com/mikodream/mahjong/card"
+	"github.com/mikodream/mahjong/tile"
+	"github.com/mikodream/mahjong/ting"
 )
 
 type State struct {

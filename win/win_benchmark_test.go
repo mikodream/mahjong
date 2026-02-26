@@ -3,7 +3,7 @@ package win
 import (
 	"testing"
 
-	"github.com/feel-easy/mahjong/card"
+	"github.com/mikodream/mahjong/card"
 )
 
 func BenchmarkWin(b *testing.B) {

@@ -1,9 +1,9 @@
 package game
 
 import (
-	"github.com/feel-easy/mahjong/card"
-	"github.com/feel-easy/mahjong/consts"
-	"github.com/feel-easy/mahjong/event"
+	"github.com/mikodream/mahjong/card"
+	"github.com/mikodream/mahjong/consts"
+	"github.com/mikodream/mahjong/event"
 )
 
 type PlayerController struct {

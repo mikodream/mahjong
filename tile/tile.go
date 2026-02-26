@@ -3,7 +3,7 @@ package tile
 import (
 	"strings"
 
-	"github.com/feel-easy/mahjong/card"
+	"github.com/mikodream/mahjong/card"
 )
 
 type Tile int

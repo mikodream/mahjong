@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/feel-easy/mahjong/card"
-	"github.com/feel-easy/mahjong/consts"
-	"github.com/feel-easy/mahjong/tile"
+	"github.com/mikodream/mahjong/card"
+	"github.com/mikodream/mahjong/consts"
+	"github.com/mikodream/mahjong/tile"
 )
 
 // ShowCard 明牌

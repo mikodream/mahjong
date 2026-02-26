@@ -1,3 +1,3 @@
-module github.com/feel-easy/mahjong
+module github.com/mikodream/mahjong
 
 go 1.18

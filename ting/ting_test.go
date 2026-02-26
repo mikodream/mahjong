@@ -5,7 +5,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/feel-easy/mahjong/card"
+	"github.com/mikodream/mahjong/card"
 )
 
 // 测试可能听的牌

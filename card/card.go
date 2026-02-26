@@ -1,6 +1,6 @@
 package card
 
-import "github.com/feel-easy/mahjong/util"
+import "github.com/mikodream/mahjong/util"
 
 func HaveGang(tiles []ID) (ID, bool) {
 	cmap := NewCMap()

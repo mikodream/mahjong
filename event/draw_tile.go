@@ -1,6 +1,6 @@
 package event
 
-import "github.com/feel-easy/mahjong/card"
+import "github.com/mikodream/mahjong/card"
 
 var PlayTile = &playTileEmitter{}
 

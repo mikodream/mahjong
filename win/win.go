@@ -3,7 +3,7 @@ package win
 import (
 	"sort"
 
-	"github.com/feel-easy/mahjong/card"
+	"github.com/mikodream/mahjong/card"
 )
 
 // CanWin 判断当前牌型是否是胡牌牌型

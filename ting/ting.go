@@ -1,8 +1,8 @@
 package ting
 
 import (
-	"github.com/feel-easy/mahjong/card"
-	"github.com/feel-easy/mahjong/win"
+	"github.com/mikodream/mahjong/card"
+	"github.com/mikodream/mahjong/win"
 )
 
 // CanTing 判断牌型是否可以听牌

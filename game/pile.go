@@ -1,6 +1,6 @@
 package game
 
-import "github.com/feel-easy/mahjong/card"
+import "github.com/mikodream/mahjong/card"
 
 type Pile struct {
 	tiles            []card.ID

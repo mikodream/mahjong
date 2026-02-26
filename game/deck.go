@@ -3,8 +3,8 @@ package game
 import (
 	"math/rand"
 
-	"github.com/feel-easy/mahjong/card"
-	"github.com/feel-easy/mahjong/tile"
+	"github.com/mikodream/mahjong/card"
+	"github.com/mikodream/mahjong/tile"
 )
 
 type Deck struct {
